@@ -124,7 +124,6 @@ The original test scaffold called out to `example.com` and `httpstat.us` directl
 
 - `audit()` does real network I/O directly inside the service method with no seam for mocking the HTTP layer (jsoup's `Jsoup.connect(...)` is called inline). It works, but it means every test either has to hit the network or spin up a real server, as above. Extracting an interface around the fetch step (e.g. a `PageFetcher`) would let pure-parsing tests run against an in-memory `Document` with zero I/O at all.
 - The `200`-with-embedded-error-status behavior (Design Decision #1) is easy to misuse from a client if not documented — it's called out above, but a `success`/`ok` boolean in the response body would make it self-evident from the JSON alone.
-- `.timeout(10_0000)` is `100,000` ms (100 seconds), which reads like a typo for `10_000` (10 seconds) — worth double-checking which was intended.
 
 ---
 
