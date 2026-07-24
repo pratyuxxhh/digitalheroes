@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Pulse</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            background:#f5f7fb;
+        }
+
+        .container{
+            width:100%;
+            max-width:750px;
+            margin:60px auto;
+            background:#fff;
+            padding:35px;
+            border-radius:14px;
+            box-shadow:0 10px 30px rgba(0,0,0,.08);
+        }
+
+        h1{
+            text-align:center;
+            color:#2563eb;
+            font-size:40px;
+            margin-bottom:8px;
+        }
+
+        .subtitle{
+            text-align:center;
+            color:#666;
+            margin-bottom:30px;
+        }
+
+        form{
+            display:flex;
+            gap:12px;
+        }
+
+        input{
+            flex:1;
+            padding:14px;
+            border:1px solid #dcdcdc;
+            border-radius:10px;
+            font-size:16px;
+            outline:none;
+            transition:.2s;
+        }
+
+        input:focus{
+            border-color:#2563eb;
+            box-shadow:0 0 0 3px rgba(37,99,235,.15);
+        }
+
+        button{
+            padding:14px 28px;
+            background:#2563eb;
+            color:white;
+            border:none;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:16px;
+            transition:.2s;
+        }
+
+        button:hover{
+            background:#1d4ed8;
+        }
+
+        button:disabled{
+            opacity:.7;
+            cursor:not-allowed;
+        }
+
+        .error{
+            display:none;
+            margin-top:25px;
+            padding:14px;
+            border-radius:10px;
+            background:#ffe6e6;
+            color:#b00020;
+            border-left:5px solid #b00020;
+        }
+
+        .result{
+            display:none;
+            margin-top:30px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            overflow:hidden;
+            border-radius:10px;
+        }
+
+        tr:nth-child(even){
+            background:#f8f9fc;
+        }
+
+        td{
+            padding:15px;
+            border-bottom:1px solid #ececec;
+        }
+
+        td:first-child{
+            width:40%;
+            font-weight:bold;
+            color:#444;
+        }
+
+        footer{
+            margin-top:auto;
+            text-align:center;
+            padding:20px;
+            background:white;
+            border-top:1px solid #e6e6e6;
+            color:#666;
+        }
+
+        footer a{
+            color:#2563eb;
+            text-decoration:none;
+            font-weight:bold;
+        }
+
+        footer a:hover{
+            text-decoration:underline;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Page Pulse</h1>
+    <p class="subtitle">Analyze any webpage in seconds</p>
+
+    <form id="auditForm">
+
+        <input
+                id="url"
+                type="url"
+                placeholder="https://example.com"
+                required>
+
+        <button id="analyzeBtn" type="submit">
+            Analyze
+        </button>
+
+    </form>
+
+    <div id="error" class="error"></div>
+
+    <div id="result" class="result">
+
+        <table>
+
+            <tr>
+                <td>Status Code</td>
+                <td id="status"></td>
+            </tr>
+
+            <tr>
+                <td>Response Time</td>
+                <td id="time"></td>
+            </tr>
+
+            <tr>
+                <td>Page Title</td>
+                <td id="title"></td>
+            </tr>
+
+            <tr>
+                <td>Meta Description</td>
+                <td id="description"></td>
+            </tr>
+
+            <tr>
+                <td>H1 Count</td>
+                <td id="h1"></td>
+            </tr>
+
+            <tr>
+                <td>Missing ALT Images</td>
+                <td id="alt"></td>
+            </tr>
+
+            <tr>
+                <td>Word Count</td>
+                <td id="words"></td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<footer>
+    Built for
+    <a href="https://digitalheroesco.com" target="_blank">
+        Digital Heroes Training Task
+    </a>
+</footer>
+
+<script>
+
+    document.getElementById("auditForm").addEventListener("submit", async function(e){
+
+        e.preventDefault();
+
+        const url = document.getElementById("url").value;
+        const button = document.getElementById("analyzeBtn");
+
+        document.getElementById("error").style.display = "none";
+        document.getElementById("result").style.display = "none";
+
+        button.disabled = true;
+        button.innerText = "Analyzing...";
+
+        try{
+
+            const response = await fetch(`/audit?url=${encodeURIComponent(url)}`,{
+                method:"POST"
+            });
+
+            const contentType = response.headers.get("content-type");
+
+            if(contentType && contentType.includes("application/json")){
+
+                const data = await response.json();
+
+                document.getElementById("status").innerText = data.status;
+                document.getElementById("time").innerText = data.responseTime + " ms";
+                document.getElementById("title").innerText = data.pageTitle ?? "-";
+                document.getElementById("description").innerText = data.metaDescription || "-";
+                document.getElementById("h1").innerText = data.h1Count;
+                document.getElementById("alt").innerText = data.missingAltImages;
+                document.getElementById("words").innerText = data.wordCount;
+
+                document.getElementById("result").style.display = "block";
+
+            }else{
+
+                const text = await response.text();
+
+                document.getElementById("error").innerText = text;
+                document.getElementById("error").style.display = "block";
+            }
+
+        }catch(e){
+
+            document.getElementById("error").innerText = "Unable to connect to server.";
+            document.getElementById("error").style.display = "block";
+
+        }finally{
+
+            button.disabled = false;
+            button.innerText = "Analyze";
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
