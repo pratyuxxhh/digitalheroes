@@ -119,6 +119,19 @@ The original test scaffold called out to `example.com` and `httpstat.us` directl
 **Reasoning:** Tests that depend on the internet and on someone else's uptime are flaky by construction — they can fail because *your* code is fine but the third-party site is slow, down, rate-limiting, or has changed its markup. A local server that returns exact, known HTML lets the tests actually verify the parsing logic (H1 counting, alt-attribute detection, word counting, meta description extraction) deterministically, in milliseconds, with no network dependency. The one exception is the "host not found" test, which still needs a real DNS lookup to trigger the actual `UnknownHostException` path.
 
 ---
+#  AI Usage
+
+AI was used as a learning and development assistant during this project. It helped with:
+
+* Learning the **JSoup** library.
+* Improving Java exception handling.
+* Writing CSS selectors to find images without `alt` text, extract `<h1>` tags, and count words.
+* Understanding differences between browser and application word counts.
+* Designing a simple and clean UI.
+* Creating the **Dockerfile** for deployment.
+* Writing and improving the **README**.
+* Debugging issues and suggesting better implementation approaches.
+
 
 ## Known limitations / what I'd change given another day
 
