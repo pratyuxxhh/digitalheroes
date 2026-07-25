@@ -1,4 +1,4 @@
-# DigitalOcean URL Audit Tool
+# Digitalheroes URL Audit Tool
 
 A small Spring Boot app that fetches a URL and returns a quick on-page SEO/health audit: HTTP status, response time, page title, meta description, H1 count, images missing `alt` text, and word count.
 
